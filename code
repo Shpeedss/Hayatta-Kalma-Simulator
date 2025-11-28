@@ -1,0 +1,154 @@
+int main(int argc, char *argv[]) {
+    // Rastgele sayı üreticisini başlat (Her çalıştırışta farklı sonuçlar için)
+    srand(time(NULL));
+
+    // Durum Değişkenleri (Kaynak: Belge Madde 4)
+    int saglik = 100;
+    int enerji = 100;
+    int yemekSayisi = 0;
+    int siginak = 0; // 0: Yok, 1: Var
+    
+    char komut;
+    int i; // Döngü sayaçları için
+
+    printf("--- KARAKTER TABANLI HAYATTA KALMA SIMULATORU ---\n");
+    printf("Komutlar: [A]vlan, [S]iginak, [R]Dinlen, [E]nvanter, [F]Tehlike, [P]Sifre, [X]Cikis\n");
+
+    // OYUN DÖNGÜSÜ (Kaynak: Belge Madde 3 - Do-While Zorunluluğu)
+    do {
+        printf("\nBir komut giriniz (A, S, R, E, F, P, X): ");
+        scanf(" %c", &komut); // Boşluk karakteri, önceki enter tuşunu yutması için
+        komut = toupper(komut); // Küçük harf girilirse büyüt
+
+        // KOMUT YÖNETİMİ (Kaynak: Belge Madde 1 - Switch-Case Zorunluluğu)
+        switch (komut) {
+            
+            case 'A': // AVLANMA
+                // (Kaynak: Belge Madde 2 - Aritmetik ve Mantıksal Operatörler)
+                if (enerji >= 15) {
+                    enerji -= 15; // Aritmetik operatör (enerji azalır)
+                    int sans = rand() % 100;
+
+                    // Mantıksal operatörler (|| ve && kullanımı)
+                    // %60 şansla yemek bulunur VE sağlık 0'dan büyükse başarılıdır
+                    if (sans < 60 && saglik > 0) {
+                        yemekSayisi++;
+                        printf("-> Basarili! Bir tavsan avladin. Yemek +1\n");
+                    } else {
+                        // Başarısızlık durumu: Yaralanma riski
+                        saglik -= 10;
+                        printf("-> Basarisiz! Avlanirken yaralandin. Saglik -10\n");
+                    }
+                } else {
+                    printf("-> Yetersiz enerji! Avlanmak icin en az 15 enerji lazim.\n");
+                }
+                break;
+
+            case 'S': // SIĞINAK ARA
+                // (Kaynak: Belge Madde 2 - IF-ELSE Yapıları)
+                if (siginak == 1) {
+                    printf("-> Zaten bir siginagin var.\n");
+                } else if (enerji >= 20) {
+                    enerji -= 20;
+                    // %40 ihtimalle sığınak bulma
+                    if (rand() % 100 < 40) {
+                        siginak = 1;
+                        printf("-> Tebrikler! Guvenli bir siginak buldun.\n");
+                    } else {
+                        printf("-> Siginak bulamadin, enerji bosa gitti.\n");
+                    }
+                } else {
+                    printf("-> Yetersiz enerji! Siginak aramak icin 20 enerji lazim.\n");
+                }
+                break;
+
+            case 'E': // ENVANTER GÖRÜNTÜLE
+                printf("\n*** DURUM RAPORU ***\n");
+                printf("Saglik : %d\n", saglik);
+                printf("Enerji : %d\n", enerji);
+                printf("Yemek  : %d\n", yemekSayisi);
+                printf("Siginak: %s\n", siginak == 1 ? "Var" : "Yok");
+                printf("********************\n");
+                break;
+
+            case 'R': // DİNLEN
+                // Aritmetik işlemlerle takip
+                if (yemekSayisi > 0) {
+                    yemekSayisi--;
+                    enerji += 20;
+                    saglik += 10;
+                    
+                    // Değerlerin 100'ü geçmemesi için kontrol
+                    if(enerji > 100) enerji = 100;
+                    if(saglik > 100) saglik = 100;
+
+                    printf("-> Yemek yedin ve dinlendin. (Enerji +20, Saglik +10)\n");
+                } else {
+                    printf("-> Yiyecek yemegin yok! Sadece uyuyarak az enerji kazandiniz.\n");
+                    enerji += 5;
+                    if(enerji > 100) enerji = 100;
+                }
+                break;
+
+            case 'F': // TEHLİKE DALGASI
+                // (Kaynak: Belge Madde 3 - FOR Döngüsü Zorunluluğu)
+                printf("!!! TEHLIKE DALGASI BASLIYOR !!!\n");
+                for (i = 1; i <= 3; i++) {
+                    int hasar = rand() % 15;
+                    saglik -= hasar;
+                    printf("Dalga %d: Firtina vurdu! %d hasar aldin.\n", i, hasar);
+                    
+                    if (saglik <= 0) {
+                        printf("Tehlike sirasinda oldunuz...\n");
+                        break; // Döngüyü kır
+                    }
+                }
+                printf("Tehlike sona erdi. Kalan Saglik: %d\n", saglik);
+                break;
+
+            case 'P': // ŞİFRELİ İLERLEME
+                // (Kaynak: Belge Madde 3 - İç İçe DO-WHILE Döngüsü Zorunluluğu)
+                {
+                    char girilenSifre;
+                    char dogruSifre = 'K'; // Örnek doğru karakter
+                    printf("Onune kilitli bir kapi cikti. Gecmek icin dogru harfi bulmalisin.\n");
+                    
+                    do {
+                        printf("Sifreyi giriniz (Bir harf): ");
+                        scanf(" %c", &girilenSifre);
+                        girilenSifre = toupper(girilenSifre);
+
+                        if (girilenSifre != dogruSifre) {
+                            printf("Yanlis sifre! Tekrar dene. (Ipucu: K)\n");
+                            enerji -= 5; // Her yanlış deneme enerji götürsün
+                        }
+                    } while (girilenSifre != dogruSifre && enerji > 0);
+
+                    if (enerji > 0) {
+                        printf("Sifre Dogru! Kapi acildi ve guvenli bolgeye gectin.\n");
+                    } else {
+                        printf("Enerjin bitti, kapiyi acamadan yigilip kaldin.\n");
+                    }
+                }
+                break;
+
+            case 'X': // ÇIKIŞ
+                printf("Simulasyondan cikiliyor...\n");
+                break;
+
+            default:
+                printf("Gecersiz komut! Lutfen tekrar deneyin.\n");
+        }
+
+        // Oyun bitti kontrolü (Sağlık 0 olursa)
+        if (saglik <= 0) {
+            printf("\n--- OYUN BITTI: HAYATTA KALAMADINIZ ---\n");
+            break;
+        }
+
+    } while (komut != 'X'); // Çıkış komutu verilmediği sürece devam et
+
+    printf("Program sonlandi.\n");
+	
+	return 0;
+}
